@@ -1,12 +1,34 @@
-# nixos-nearcore
+Deploying NEAR Using NixOS / NixOps
+================================================================================
 
 NixOS is a declarative operating system that allows describing your deployment
-in terms of a purely functional declarative language named [Nix][]. Before we 
-get started you will need two files, a Nix expression and a patch, in order to 
-build **neard** through nix. Save the following two files as `near.nix` and 
-`gitpatch.patch` respectively:
+in terms of a purely functional declarative language named [Nix][]. There are
+some great reasons to use Nix / NixOps:
+
+- Infrastructure as Code: Same properties to Terraform.
+- Declarative Infrastructure: Unlike Terraform, we can describe systems also.
+- Instant Rollbacks: NixOS can revert the software setup of any setup instantly.
+- Automated Tests: NEAR is automatically tested during the package build. More on this below.
+
+With all these properties, we can create a CI/CD pipeline that is robust, secure,
+testable, and completely version controlled. The single biggest benefit here is
+unlike Terraform setups, we can test and manage our entire deployed software
+stack as well.
+
+--------------------------------------------------------------------------------
+
+Before we get started you will need two files, a Nix expression and a patch, in 
+order to build **neard** through nix. Save the following two files as `near.nix`
+and `gitpatch.patch` respectively:
 
 ### near.nix
+
+This nix expression will build **neard** using the correct rust nightly, the
+build is as deterministic (if neard is buildable as a reproducible build then
+the following nix expression will give you a guaranteed binary!).
+
+**NOTE**: This will test neard, if neard fails to pass its own unit/integration
+tests then the build will fail, and nixos will automatically prevent deployment!
 
 ```nix
 { clang
@@ -101,7 +123,7 @@ index f3a560bd..70d66073 100644
 Once you have these two files saved as `near.nix` and `gitfix.patch` 
 respectively we can start preparing an automated CI pipeline on top of nixops.
 
-# A NixOps 101
+# CI/CD: A NixOps 101
 
 If you already know NixOps, you can skip this section (and probably the guide
 if you only came for the nix expression above). If not, here's a quick primer
@@ -121,8 +143,7 @@ your `~/.aws/credentials` file.
 ```nix
 { region      ? "us-west-2"
 , accessKeyId ? "dev"
-}:
-
+}
 let
 backend = { config, region, ... }:
 {
@@ -163,7 +184,7 @@ CI pipeline. In this example we are utilizing AWS, so we need to provide some
 AWS keys in scope. GitHub secrets allows us to do this securely, and can be
 done by going to **Repo -> Settings -> Secrets**. For example:
 
-![](https://user-images.githubusercontent.com/158967/94892510-598c0c80-0474-11eb-9c20-08b5278cdfa2.png)
+![](assets/images/2020-10-02-06-55-19.png)
 
 With our secrets ready, let's setup a new basic pipeline. We can use a script to
 setup and prepare nixops for deployment. Here's our initial Github Action 
