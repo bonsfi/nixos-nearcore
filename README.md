@@ -15,12 +15,6 @@ testable, and completely version controlled. The single biggest benefit here is
 unlike Terraform setups, we can test and manage our entire deployed software
 stack as well.
 
---------------------------------------------------------------------------------
-
-Before we get started you will need two files, a Nix expression and a patch, in 
-order to build **neard** through nix. Save the following two files as `near.nix`
-and `gitpatch.patch` respectively:
-
 ### near.nix
 
 This nix expression will build **neard** using the correct rust nightly, the
@@ -87,7 +81,8 @@ rustPlatform.buildRustPackage rec {
 
 You'll also need the following patch, which disables neard's git versioning. You
 need this because the above nix expression does not compile within a git clone
-of the repo and NEAR does not yet handle this gracefully.
+of the repo, instead pulling a release tarball. NEAR does not yet handle this
+gracefully (perhaps we'll PR this!).
 
 ```patch
 diff --git a/neard/src/main.rs b/neard/src/main.rs
@@ -123,7 +118,7 @@ index f3a560bd..70d66073 100644
 Once you have these two files saved as `near.nix` and `gitfix.patch` 
 respectively we can start preparing an automated CI pipeline on top of nixops.
 
-# CI/CD: A NixOps 101
+# A NixOps 101
 
 If you already know NixOps, you can skip this section (and probably the guide
 if you only came for the nix expression above). If not, here's a quick primer
@@ -143,7 +138,8 @@ your `~/.aws/credentials` file.
 ```nix
 { region      ? "us-west-2"
 , accessKeyId ? "dev"
-}
+}:
+
 let
 backend = { config, region, ... }:
 {
@@ -184,7 +180,7 @@ CI pipeline. In this example we are utilizing AWS, so we need to provide some
 AWS keys in scope. GitHub secrets allows us to do this securely, and can be
 done by going to **Repo -> Settings -> Secrets**. For example:
 
-![](assets/images/2020-10-02-06-55-19.png)
+![](https://user-images.githubusercontent.com/158967/94892510-598c0c80-0474-11eb-9c20-08b5278cdfa2.png)
 
 With our secrets ready, let's setup a new basic pipeline. We can use a script to
 setup and prepare nixops for deployment. Here's our initial Github Action 
