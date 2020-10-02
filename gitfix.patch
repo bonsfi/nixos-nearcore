@@ -1,0 +1,28 @@
+diff --git a/neard/src/main.rs b/neard/src/main.rs
+index ab380ef8..595b585d 100644
+--- a/neard/src/main.rs
++++ b/neard/src/main.rs
+@@ -65,8 +65,7 @@ fn main() {
+     openssl_probe::init_ssl_cert_env_vars();
+
+     let default_home = get_default_home();
+-    let version =
+-        Version { version: crate_version!().to_string(), build: git_version!().to_string() };
++    let version = Version { version: crate_version!().to_string(), build: "00000000".to_string() };
+     let matches = App::new("NEAR Protocol Node")
+         .setting(AppSettings::SubcommandRequiredElseHelp)
+         .version(format!("{} (build {})", version.version, version.build).as_str())
+diff --git a/test-utils/loadtester/src/main.rs b/test-utils/loadtester/src/main.rs
+index f3a560bd..70d66073 100644
+--- a/test-utils/loadtester/src/main.rs
++++ b/test-utils/loadtester/src/main.rs
+@@ -42,8 +42,7 @@ fn configure_logging(log_level: log::LevelFilter) {
+ }
+
+ fn main() {
+-    let version =
+-        Version { version: crate_version!().to_string(), build: git_version!().to_string() };
++    let version = Version { version: crate_version!().to_string(), build: "00000000".to_string() };
+     let default_home = get_default_home();
+
+     let matches = App::new("NEAR Protocol loadtester")
